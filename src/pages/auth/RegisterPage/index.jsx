@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import useRegister from "../../hooks/useRegister";
+import useRegister from "../../../hooks/useRegister";
 import { useNavigate } from "react-router-dom";
 
 export default function RegisterPage() {

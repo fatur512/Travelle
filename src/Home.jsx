@@ -1,19 +1,11 @@
 import React from "react";
 import Banners from "./components/Banners.jsx"; // Sesuaikan path ini
+import NavbarUser from "./components/NavbarUser.jsx";
 
 export default function HomePage() {
   return (
     <div className="min-h-screen pb-10 bg-gray-100">
-      <header className="py-4 bg-white shadow-md">
-        <nav className="container flex items-center justify-between px-4 mx-auto">
-          <h1 className="text-2xl font-bold text-gray-800">My Travel Journal</h1>
-          {/* Anda bisa menambahkan link navigasi di sini */}
-          <div>
-            {/* <Link to="/login" className="mx-2 text-blue-600 hover:underline">Login</Link>
-            <Link to="/register" className="mx-2 text-blue-600 hover:underline">Register</Link> */}
-          </div>
-        </nav>
-      </header>
+      <header className="py-4 bg-white shadow-md"></header>
 
       <main className="pt-8">
         <h2 className="mb-8 text-3xl font-extrabold text-center text-gray-900">Welcome to Your Adventure!</h2>

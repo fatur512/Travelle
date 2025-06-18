@@ -13,21 +13,25 @@ export default function useLogin() {
     setError("");
     setSuccess("");
 
-    const payload = { email, password };
-
     try {
-      const res = await axios.post("https://travel-journal-api-bootcamp.do.dibimbing.id/api/v1/login", payload, {
-        headers: {
-          apiKey: "24405e01-fbc1-45a5-9f5a-be13afcd757c",
-        },
-      });
+      const res = await axios.post(
+        "https://travel-journal-api-bootcamp.do.dibimbing.id/api/v1/login",
+        { email, password },
+        {
+          headers: {
+            apiKey: "24405e01-fbc1-45a5-9f5a-be13afcd757c",
+          },
+        }
+      );
 
-      Cookies.set("token", res.data.token, { expires: 7 });
+      const { token, data } = res.data;
+
+      Cookies.set("token", token, { expires: 7 });
       Cookies.set("isLoggedIn", "true", { expires: 7 });
 
-      if (res.data.data) {
-        setUser(res.data.data);
-        Cookies.set("user", JSON.stringify(res.data.data), { expires: 7 });
+      if (data) {
+        setUser(data);
+        Cookies.set("user", JSON.stringify(data), { expires: 7 });
       }
 
       setSuccess("Login berhasil!");
@@ -40,7 +44,7 @@ export default function useLogin() {
         errorMessage = err.response.data.message;
       }
       setError(errorMessage);
-      console.error("Error during login:", err);
+      console.error("Login error:", err);
       return null;
     } finally {
       setLoading(false);
