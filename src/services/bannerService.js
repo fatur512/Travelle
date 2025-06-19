@@ -1,23 +1,15 @@
-// src/services/bannerService.js
 import axios from "axios";
 
 const API_URL = "https://travel-journal-api-bootcamp.do.dibimbing.id/api/v1";
 const API_KEY = "24405e01-fbc1-45a5-9f5a-be13afcd757c";
 
-// Global Axios Config
-const axiosInstance = axios.create({
-  baseURL: API_URL,
-  withCredentials: true, // Kirim cookie jika dibutuhkan untuk otentikasi
-  headers: {
-    apiKey: API_KEY,
-  },
-});
-
 // GET banners
 export const fetchBanners = async () => {
   try {
     const res = await axios.get(`${API_URL}/banners`, {
-      withCredentials: true,
+      headers: {
+        apiKey: API_KEY,
+      },
     });
     return res.data.data;
   } catch (error) {
@@ -28,8 +20,9 @@ export const fetchBanners = async () => {
 
 // CREATE banner
 export const createBanner = async (data) => {
-  const res = await axiosInstance.post("/create-banner", data, {
+  const res = await axios.post(`${API_URL}/create-banner`, data, {
     headers: {
+      apiKey: API_KEY,
       "Content-Type": "multipart/form-data",
     },
   });
@@ -38,8 +31,9 @@ export const createBanner = async (data) => {
 
 // UPDATE banner
 export const updateBanner = async (id, data) => {
-  const res = await axiosInstance.post(`/update-banner/${id}`, data, {
+  const res = await axios.post(`${API_URL}/update-banner/${id}`, data, {
     headers: {
+      apiKey: API_KEY,
       "Content-Type": "multipart/form-data",
     },
   });
@@ -48,6 +42,10 @@ export const updateBanner = async (id, data) => {
 
 // DELETE banner
 export const deleteBanner = async (id) => {
-  const res = await axiosInstance.delete(`/delete-banner/${id}`);
+  const res = await axios.delete(`${API_URL}/delete-banner/${id}`, {
+    headers: {
+      apiKey: API_KEY,
+    },
+  });
   return res.data;
 };
