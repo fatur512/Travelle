@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
-import useLogin from "../../hooks/useLogin";
+import useLogin from "../hooks/useLogin";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
