@@ -1,10 +1,44 @@
 import React from "react";
 import useBanner from "../../hooks/banner/useBanner";
 import usePromo from "../../hooks/promo/usePromo";
+import useActivities from "../../hooks/activities/useActivities";
+import axios from "axios";
+import { API_KEY, API_URL } from "../../config/env";
+import Cookies from "js-cookie";
+import { useNavigate } from "react-router-dom";
 
-export default function UserPage() {
+export default function UserDashboard() {
   const { banners, loading: bannerLoading, error: bannerError } = useBanner();
   const { promos, loading: promoLoading, error: promoError } = usePromo();
+  const { activities, loading, error } = useActivities();
+
+  const navigate = useNavigate();
+
+  const handleAddToCart = async (activityId) => {
+    const token = Cookies.get("token");
+
+    if (!token) {
+      alert("You must be logged in to add to cart.");
+      return navigate("/login");
+    }
+
+    try {
+      await axios.post(
+        `${API_URL}/add-cart`,
+        { activityId }, // sesuai payload yang kamu kasih
+        {
+          headers: {
+            apiKey: API_KEY,
+            Authorization: `Bearer ${token}`, // ✅ Token harus disertakan di header
+          },
+        }
+      );
+      alert("Added to cart successfully!");
+    } catch (err) {
+      console.error("Failed to add to cart:", err.response?.data || err.message);
+      alert(`Failed to add to cart: ${err.response?.data?.message || "Unknown error"}`);
+    }
+  };
 
   return (
     <div className="min-h-screen pb-10 bg-gray-100">
@@ -64,6 +98,42 @@ export default function UserPage() {
                     <h4 className="text-base font-bold">{promo.title}</h4>
                     <p className="text-sm text-gray-600 line-clamp-2">{promo.description}</p>
                   </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
+
+        {/* 🧭 Activities Section */}
+        <section className="container px-4 mx-auto mt-8">
+          <h3 className="mb-4 text-xl font-semibold text-gray-700">Activities</h3>
+
+          {loading && <p className="text-gray-500">Loading activities...</p>}
+          {error && <p className="text-red-600">{error}</p>}
+
+          {!loading && !error && (
+            <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3">
+              {activities.map((activity) => (
+                <div key={activity.id} className="overflow-hidden bg-white rounded-lg shadow-md">
+                  <img
+                    src={activity.category.imageUrl}
+                    alt={activity.title}
+                    className="w-full h-[180px] object-cover"
+                    onError={(e) => (e.target.style.display = "none")}
+                  />
+                  <div className="p-4">
+                    <h4 className="text-lg font-bold">{activity.title}</h4>
+                    <p className="text-sm text-gray-600 line-clamp-3">{activity.description}</p>
+                  </div>
+                  <div className="p-4">
+                    <h4 className="text-base font-bold">{activity.price}</h4>
+                  </div>
+                  <button
+                    onClick={() => handleAddToCart(activity.id)}
+                    className="w-full px-4 py-2 mt-4 text-white bg-blue-600 rounded hover:bg-blue-700"
+                  >
+                    Add to Cart
+                  </button>
                 </div>
               ))}
             </div>

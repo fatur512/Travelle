@@ -1,11 +1,12 @@
 import React from "react";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, BrowserRouter } from "react-router-dom";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import AdminLayout from "./layouts/AdminLayout";
 import UserLayout from "./layouts/UserLayout";
 import AdminDashboard from "./pages/admin/AdminDashboard";
-import UserDashboard from "./pages/user/UserDashboard";
+import UserDashboard from "./pages/user/userDashboard";
 import LoginPage from "./pages/LoginPage";
+import UserRoutes from "./routes/UserRoutes";
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
           </ProtectedRoute>
         }
       />
+      <Route path="/*" element={<UserRoutes />} />
 
       {/* Route untuk admin */}
       <Route

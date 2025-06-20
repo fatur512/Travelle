@@ -1,7 +1,7 @@
 import React from "react";
 import { Route } from "react-router-dom";
-import ProtectedRoute from "./ProtectedRoute";
 import UserLayout from "../layouts/UserLayout";
+import ProtectedRoute from "./ProtectedRoute";
 
 import UserDashboard from "../pages/user/UserDashboard";
 import ProfilePage from "../pages/user/ProfilePage";
@@ -9,16 +9,17 @@ import ProfilePage from "../pages/user/ProfilePage";
 export default function UserRoutes() {
   return (
     <>
+      {/* 🟢 Halaman utama bebas diakses */}
       <Route
         path="/"
         element={
-          <ProtectedRoute allowedRole="user">
-            <UserLayout>
-              <UserDashboard />
-            </UserLayout>
-          </ProtectedRoute>
+          <UserLayout>
+            <UserDashboard />
+          </UserLayout>
         }
       />
+
+      {/* 🔒 Halaman profile tetap dilindungi */}
       <Route
         path="/profile"
         element={

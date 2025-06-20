@@ -1,7 +1,5 @@
 import axios from "axios";
-
-const API_URL = "https://travel-journal-api-bootcamp.do.dibimbing.id/api/v1";
-const API_KEY = "24405e01-fbc1-45a5-9f5a-be13afcd757c";
+import { API_KEY, API_URL } from "../config/env";
 
 // GET banners
 export const fetchBanners = async () => {
