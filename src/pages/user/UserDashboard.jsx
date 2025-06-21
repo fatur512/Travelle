@@ -1,18 +1,25 @@
-import React from "react";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import useBanner from "../../hooks/banner/useBanner";
 import usePromo from "../../hooks/promo/usePromo";
 import useActivities from "../../hooks/activities/useActivities";
 import axios from "axios";
-import { API_KEY, API_URL } from "../../config/env";
 import Cookies from "js-cookie";
-import { useNavigate } from "react-router-dom";
+import { API_KEY, API_URL } from "../../config/env";
+import { useCart } from "../../context/CartContext";
 
 export default function UserDashboard() {
+  const navigate = useNavigate();
   const { banners, loading: bannerLoading, error: bannerError } = useBanner();
   const { promos, loading: promoLoading, error: promoError } = usePromo();
   const { activities, loading, error } = useActivities();
+  const { addCarts } = useCart(); // 🎯 Ambil dari CartContext
 
-  const navigate = useNavigate();
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 6;
+
+  const totalPages = Math.ceil(activities.length / ITEMS_PER_PAGE);
+  const paginatedActivities = activities.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
 
   const handleAddToCart = async (activityId) => {
     const token = Cookies.get("token");
@@ -24,15 +31,17 @@ export default function UserDashboard() {
 
     try {
       await axios.post(
-        `${API_URL}/add-cart`,
-        { activityId }, // sesuai payload yang kamu kasih
+        `${API_URL}/add-cart`, // ⬅️ pastikan tidak dobel /api/v1
+        { activityId },
         {
           headers: {
             apiKey: API_KEY,
-            Authorization: `Bearer ${token}`, // ✅ Token harus disertakan di header
+            Authorization: `Bearer ${token}`,
           },
         }
       );
+
+      await addCarts(); // ✅ Update data cart di context
       alert("Added to cart successfully!");
     } catch (err) {
       console.error("Failed to add to cart:", err.response?.data || err.message);
@@ -45,7 +54,7 @@ export default function UserDashboard() {
       <main className="pt-8">
         <h2 className="mb-8 text-3xl font-extrabold text-center text-gray-900">Welcome to Your Adventure!</h2>
 
-        {/* 🚩 Banner Section */}
+        {/* 🎯 Banner Section */}
         <section className="container px-4 mx-auto">
           <h3 className="mb-4 text-xl font-semibold text-gray-700">Featured Banners</h3>
 
@@ -105,49 +114,67 @@ export default function UserDashboard() {
         </section>
 
         {/* 🧭 Activities Section */}
-        <section className="container px-4 mx-auto mt-8">
+        <section className="container px-4 mx-auto mt-10">
           <h3 className="mb-4 text-xl font-semibold text-gray-700">Activities</h3>
 
           {loading && <p className="text-gray-500">Loading activities...</p>}
           {error && <p className="text-red-600">{error}</p>}
 
           {!loading && !error && (
-            <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3">
-              {activities.map((activity) => (
-                <div key={activity.id} className="overflow-hidden bg-white rounded-lg shadow-md">
-                  <img
-                    src={activity.category.imageUrl}
-                    alt={activity.title}
-                    className="w-full h-[180px] object-cover"
-                    onError={(e) => (e.target.style.display = "none")}
-                  />
-                  <div className="p-4">
-                    <h4 className="text-lg font-bold">{activity.title}</h4>
-                    <p className="text-sm text-gray-600 line-clamp-3">{activity.description}</p>
-                  </div>
-                  <div className="p-4">
-                    <h4 className="text-base font-bold">{activity.price}</h4>
-                  </div>
-                  <button
-                    onClick={() => handleAddToCart(activity.id)}
-                    className="w-full px-4 py-2 mt-4 text-white bg-blue-600 rounded hover:bg-blue-700"
+            <>
+              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                {paginatedActivities.map((activity) => (
+                  <div
+                    key={activity.id}
+                    className="flex flex-col overflow-hidden transition bg-white shadow rounded-xl hover:shadow-lg"
                   >
-                    Add to Cart
+                    <img
+                      src={activity.category?.imageUrl}
+                      alt={activity.title}
+                      className="w-full h-[180px] object-cover"
+                      onError={(e) => (e.target.style.display = "none")}
+                    />
+                    <div className="flex-grow p-4">
+                      <h4 className="mb-1 text-lg font-bold">{activity.title}</h4>
+                      <p className="text-sm text-gray-600 line-clamp-3">{activity.description}</p>
+                    </div>
+                    <div className="p-4 border-t">
+                      <p className="mb-3 text-base font-semibold text-blue-600">{activity.price}</p>
+                      <button
+                        onClick={() => handleAddToCart(activity.id)}
+                        className="w-full px-4 py-2 text-white transition-all duration-200 bg-blue-600 rounded hover:bg-blue-700 hover:shadow"
+                      >
+                        Add to Cart
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* 🔁 Pagination Controls */}
+              {totalPages > 1 && (
+                <div className="flex items-center justify-center gap-4 mt-6">
+                  <button
+                    onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                    disabled={currentPage === 1}
+                    className="px-4 py-2 text-sm text-white bg-gray-600 rounded disabled:opacity-50"
+                  >
+                    Previous
+                  </button>
+                  <span className="text-sm font-medium text-gray-700">
+                    Page {currentPage} of {totalPages}
+                  </span>
+                  <button
+                    onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                    disabled={currentPage === totalPages}
+                    className="px-4 py-2 text-sm text-white bg-gray-600 rounded disabled:opacity-50"
+                  >
+                    Next
                   </button>
                 </div>
-              ))}
-            </div>
+              )}
+            </>
           )}
-        </section>
-
-        {/* CTA Section */}
-        <section className="container px-4 mx-auto mt-12 text-center">
-          <p className="text-lg text-gray-700">
-            Discover amazing places and share your travel experiences with the world.
-          </p>
-          <button className="px-6 py-3 mt-6 font-semibold text-white transition duration-300 bg-blue-600 rounded-lg shadow-md hover:bg-blue-700">
-            Start Exploring
-          </button>
         </section>
       </main>
 
