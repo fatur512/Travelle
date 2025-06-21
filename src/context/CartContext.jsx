@@ -8,7 +8,7 @@ export function CartProvider({ children }) {
   const [carts, setCarts] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const addCarts = async () => {
+  const loadCarts = async () => {
     setLoading(true);
     try {
       const data = await fetchCarts();
@@ -28,12 +28,27 @@ export function CartProvider({ children }) {
     setCarts((prev) => prev.filter((item) => item.id !== id));
   };
 
+  const updateQuantity = (id, newQuantity) => {
+    setCarts((prevCarts) =>
+      prevCarts.map((item) => (item.id === id ? { ...item, quantity: Math.max(1, newQuantity) } : item))
+    );
+  };
+
   useEffect(() => {
-    addCarts(); // load saat pertama
+    loadCarts(); // saat mount
   }, []);
 
   return (
-    <CartContext.Provider value={{ carts, loading, addToCart, removeFromCart, addCarts }}>
+    <CartContext.Provider
+      value={{
+        carts,
+        loading,
+        addToCart,
+        removeFromCart,
+        updateQuantity,
+        loadCarts,
+      }}
+    >
       {children}
     </CartContext.Provider>
   );

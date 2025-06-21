@@ -1,58 +1,30 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import useBanner from "../../hooks/banner/useBanner";
 import usePromo from "../../hooks/promo/usePromo";
 import useActivities from "../../hooks/activities/useActivities";
-import axios from "axios";
-import Cookies from "js-cookie";
-import { API_KEY, API_URL } from "../../config/env";
-import { useCart } from "../../context/CartContext";
+import UserDashboardTopCategories from "./userDashboardCategories";
+import { Link } from "react-router-dom";
 
 export default function UserDashboard() {
-  const navigate = useNavigate();
   const { banners, loading: bannerLoading, error: bannerError } = useBanner();
   const { promos, loading: promoLoading, error: promoError } = usePromo();
   const { activities, loading, error } = useActivities();
-  const { addCarts } = useCart(); // 🎯 Ambil dari CartContext
 
+  // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const ITEMS_PER_PAGE = 6;
 
+  // Calculate total pages and slice activities for current page
   const totalPages = Math.ceil(activities.length / ITEMS_PER_PAGE);
   const paginatedActivities = activities.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
-
-  const handleAddToCart = async (activityId) => {
-    const token = Cookies.get("token");
-
-    if (!token) {
-      alert("You must be logged in to add to cart.");
-      return navigate("/login");
-    }
-
-    try {
-      await axios.post(
-        `${API_URL}/add-cart`, // ⬅️ pastikan tidak dobel /api/v1
-        { activityId },
-        {
-          headers: {
-            apiKey: API_KEY,
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      await addCarts(); // ✅ Update data cart di context
-      alert("Added to cart successfully!");
-    } catch (err) {
-      console.error("Failed to add to cart:", err.response?.data || err.message);
-      alert(`Failed to add to cart: ${err.response?.data?.message || "Unknown error"}`);
-    }
-  };
 
   return (
     <div className="min-h-screen pb-10 bg-gray-100">
       <main className="pt-8">
         <h2 className="mb-8 text-3xl font-extrabold text-center text-gray-900">Welcome to Your Adventure!</h2>
+
+        {/* 🏷️ Categories Section */}
+        <UserDashboardTopCategories />
 
         {/* 🎯 Banner Section */}
         <section className="container px-4 mx-auto">
@@ -140,12 +112,12 @@ export default function UserDashboard() {
                     </div>
                     <div className="p-4 border-t">
                       <p className="mb-3 text-base font-semibold text-blue-600">{activity.price}</p>
-                      <button
-                        onClick={() => handleAddToCart(activity.id)}
-                        className="w-full px-4 py-2 text-white transition-all duration-200 bg-blue-600 rounded hover:bg-blue-700 hover:shadow"
+                      <Link
+                        to={`/activity/${activity.id}`}
+                        className="block w-full px-4 py-2 mt-4 text-center text-white bg-blue-600 rounded hover:bg-blue-700"
                       >
-                        Add to Cart
-                      </button>
+                        Lihat Detail
+                      </Link>
                     </div>
                   </div>
                 ))}
