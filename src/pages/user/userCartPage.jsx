@@ -1,15 +1,49 @@
-import React from "react";
+import React, { useState } from "react";
 import { useCart } from "../../context/CartContext";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function UserCartPage() {
-  const { carts, loading, removeFromCart, updateQuantity } = useCart();
+  const { carts, loading, removeFromCart, updateQuantity, decreaseQuantity } = useCart();
+  const [selectedItems, setSelectedItems] = useState([]);
+  const navigate = useNavigate();
 
-  const totalPrice = carts.reduce((acc, item) => {
+  const isAllSelected = carts.length > 0 && selectedItems.length === carts.length;
+
+  const handleCheckboxChange = (itemId) => {
+    setSelectedItems((prev) => (prev.includes(itemId) ? prev.filter((id) => id !== itemId) : [...prev, itemId]));
+  };
+
+  const handleSelectAll = () => {
+    if (isAllSelected) {
+      setSelectedItems([]);
+    } else {
+      const allIds = carts.map((item) => item.id);
+      setSelectedItems(allIds);
+    }
+  };
+
+  const selectedCartItems = carts.filter((item) => selectedItems.includes(item.id));
+
+  const totalSelectedPrice = selectedCartItems.reduce((acc, item) => {
     const price = typeof item.activity?.price === "number" ? item.activity.price : 0;
     const qty = item.quantity || 1;
     return acc + price * qty;
   }, 0);
+
+  const handleCheckout = () => {
+    if (selectedItems.length === 0) {
+      alert("Silakan pilih item yang ingin di-checkout.");
+      return;
+    }
+
+    // Navigasi ke halaman checkout dan kirim data lewat state
+    navigate("/checkout", {
+      state: {
+        items: selectedCartItems,
+        total: totalSelectedPrice,
+      },
+    });
+  };
 
   return (
     <div className="min-h-screen px-4 py-8 bg-gray-100">
@@ -24,29 +58,55 @@ export default function UserCartPage() {
       ) : carts.length === 0 ? (
         <p className="text-center text-gray-600">Your cart is empty.</p>
       ) : (
-        <div className="max-w-3xl mx-auto space-y-4">
+        <div className="max-w-4xl mx-auto space-y-4">
+          {/* Select All Checkbox */}
+          <div className="flex items-center gap-2 p-2 bg-white shadow rounded-xl">
+            <input
+              type="checkbox"
+              checked={isAllSelected}
+              onChange={handleSelectAll}
+              className="w-5 h-5 text-blue-600"
+            />
+            <label className="text-sm font-medium text-gray-700">Pilih Semua</label>
+          </div>
+
+          {/* Item List */}
           {carts
-            .filter((item) => item.activity) // pastikan activity tidak null
+            .filter((item) => item.activity)
             .map((item) => {
-              const activity = item.activity;
+              const { activity, quantity = 1 } = item;
               const imageUrl = activity.imageUrls?.[0] || null;
-              const quantity = item.quantity || 1;
+              const isChecked = selectedItems.includes(item.id);
 
               return (
-                <div key={item.id} className="flex gap-4 p-4 bg-white shadow rounded-xl">
+                <div
+                  key={item.id}
+                  className={`flex items-center gap-4 p-4 bg-white shadow rounded-xl ${
+                    isChecked ? "border-blue-500 border-2" : ""
+                  }`}
+                >
+                  <input
+                    type="checkbox"
+                    checked={isChecked}
+                    onChange={() => handleCheckboxChange(item.id)}
+                    className="w-5 h-5 text-blue-600"
+                  />
+
+                  {/* Gambar aktivitas */}
                   {imageUrl ? (
                     <img
                       src={imageUrl}
                       alt={activity.title || "Image"}
-                      className="object-cover rounded w-28 h-28"
+                      className="object-cover w-24 h-24 rounded"
                       onError={(e) => (e.target.style.display = "none")}
                     />
                   ) : (
-                    <div className="flex items-center justify-center text-sm text-gray-500 bg-gray-200 rounded w-28 h-28">
+                    <div className="flex items-center justify-center w-24 h-24 text-sm text-gray-500 bg-gray-200 rounded">
                       No Image
                     </div>
                   )}
 
+                  {/* Info aktivitas */}
                   <div className="flex-1">
                     <Link to={`/activity/${activity.id}`}>
                       <h4 className="text-lg font-bold text-blue-700 hover:underline">{activity.title}</h4>
@@ -55,7 +115,7 @@ export default function UserCartPage() {
 
                     <div className="flex items-center gap-2 mt-2">
                       <button
-                        onClick={() => updateQuantity(item.id, Math.max(1, quantity - 1))}
+                        onClick={() => decreaseQuantity(item.id)}
                         disabled={quantity <= 1}
                         className="px-2 py-1 text-sm text-white bg-gray-500 rounded hover:bg-gray-600 disabled:opacity-50"
                       >
@@ -73,7 +133,7 @@ export default function UserCartPage() {
                     <p className="mt-2 text-sm font-bold text-blue-600">Rp {activity.price?.toLocaleString("id-ID")}</p>
                   </div>
 
-                  <div className="flex items-start">
+                  <div>
                     <button
                       onClick={() => removeFromCart(item.id)}
                       className="px-3 py-2 text-sm text-white bg-red-500 rounded hover:bg-red-600"
@@ -85,13 +145,18 @@ export default function UserCartPage() {
               );
             })}
 
-          {/* Total dan Checkout */}
-          <div className="p-4 mt-6 bg-white shadow rounded-xl">
+          {/* Total & Checkout */}
+          <div className="p-4 space-y-4 bg-white shadow rounded-xl">
             <div className="flex justify-between text-lg font-bold text-gray-800">
-              <span>Total:</span>
-              <span>Rp {totalPrice.toLocaleString("id-ID")}</span>
+              <span>Total yang Dipilih:</span>
+              <span>Rp {totalSelectedPrice.toLocaleString("id-ID")}</span>
             </div>
-            <button className="w-full px-4 py-2 mt-4 text-white bg-green-600 rounded hover:bg-green-700">
+
+            <button
+              onClick={handleCheckout}
+              className="w-full px-4 py-2 font-semibold text-white bg-blue-600 rounded hover:bg-blue-700"
+              disabled={selectedItems.length === 0}
+            >
               Checkout
             </button>
           </div>

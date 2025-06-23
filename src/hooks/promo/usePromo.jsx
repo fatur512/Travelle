@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { fetchPromos } from "../../services/promoService";
-import { data } from "react-router-dom";
 
 export default function usePromo() {
   const [promos, setPromos] = useState();

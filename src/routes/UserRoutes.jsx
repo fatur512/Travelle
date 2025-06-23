@@ -3,11 +3,17 @@ import { Routes, Route } from "react-router-dom";
 import UserLayout from "../layouts/UserLayout";
 import ProtectedRoute from "./ProtectedRoute";
 
-import UserDashboard from "../pages/user/UserDashboard";
 import ProfilePage from "../pages/user/ProfilePage";
-import UserCartPage from "../pages/user/UserCartPage"; // Tambahkan jika ada
-import ActivityDetailPage from "../pages/user/ActivityDetailPage";
+import UserCartPage from "../pages/user/UserCartPage"; // Tambahkan
 import CategoryListPage from "../pages/user/CategoryListPage";
+import CategoryDetailPage from "../pages/user/CategoryDetailPage";
+import ActivityListPage from "../pages/user/ActivityListPage";
+import ActivityDetailPage from "../pages/user/ActivityDetailPage";
+import UserDashboard from "../pages/user/userDashboard";
+import BannerPage from "../pages/user/BannerPage";
+import PromoPage from "../pages/user/PromoPage";
+import CheckOutPage from "../pages/user/CheckOutPage";
+import TransactionPage from "../pages/user/TransactionPage";
 
 export default function UserRoutes() {
   return (
@@ -21,6 +27,27 @@ export default function UserRoutes() {
               <UserDashboard />
             </UserLayout>
           </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/banners"
+        element={
+          <ProtectedRoute>
+            <UserLayout>
+              <BannerPage />
+            </UserLayout>
+          </ProtectedRoute>
+        }
+      />
+
+      {/* 🎉 Halaman Promo */}
+      <Route
+        path="/promo"
+        element={
+          <UserLayout>
+            <PromoPage />
+          </UserLayout>
         }
       />
 
@@ -48,21 +75,62 @@ export default function UserRoutes() {
         }
       />
 
+      <Route
+        path="/checkout"
+        element={
+          <ProtectedRoute>
+            <UserLayout>
+              <CheckOutPage />
+            </UserLayout>
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/my-transactions"
+        element={
+          <ProtectedRoute allowedRole="user">
+            <UserLayout>
+              <TransactionPage />
+            </UserLayout>
+          </ProtectedRoute>
+        }
+      />
+
       {/* 🔍 Halaman detail aktivitas */}
       <Route
         path="/activity"
+        element={
+          <UserLayout>
+            <ActivityListPage />
+          </UserLayout>
+        }
+      />
+
+      <Route
+        path="/activity/:id"
         element={
           <UserLayout>
             <ActivityDetailPage />
           </UserLayout>
         }
       />
+
       {/* 🟢 Halaman kategori, bebas akses */}
       <Route
         path="/categories"
         element={
           <UserLayout>
             <CategoryListPage />
+          </UserLayout>
+        }
+      />
+
+      <Route
+        path="/categories/:id"
+        element={
+          <UserLayout>
+            <CategoryDetailPage />
           </UserLayout>
         }
       />

@@ -24,6 +24,12 @@ export function CartProvider({ children }) {
     setCarts((prev) => [...prev, item]);
   };
 
+  const decreaseQuantity = (id) => {
+    setCarts((prevCarts) =>
+      prevCarts.map((item) => (item.id === id ? { ...item, quantity: Math.max(1, (item.quantity || 1) - 1) } : item))
+    );
+  };
+
   const removeFromCart = (id) => {
     setCarts((prev) => prev.filter((item) => item.id !== id));
   };
@@ -46,6 +52,7 @@ export function CartProvider({ children }) {
         addToCart,
         removeFromCart,
         updateQuantity,
+        decreaseQuantity,
         loadCarts,
       }}
     >

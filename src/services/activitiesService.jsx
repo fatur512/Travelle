@@ -1,22 +1,19 @@
+// ✅ Perbaikan typo dan stabilisasi service
 import axios from "axios";
 import { API_KEY, API_URL } from "../config/env";
 
-// GET activities
-export const fetchActivites = async () => {
+export const fetchActivities = async () => {
   try {
     const res = await axios.get(`${API_URL}/activities`, {
-      headers: {
-        apiKey: API_KEY,
-      },
+      headers: { apiKey: API_KEY },
     });
     return res.data.data;
   } catch (error) {
-    console.error("getActiivities failed", error.response?.data || error.message);
+    console.error("fetchActivities failed:", error.response?.data || error.message);
     throw error;
   }
 };
 
-// GET activity by ID
 export const fetchActivityById = async (id) => {
   if (!id || id === "undefined") {
     throw new Error("Invalid activity ID");

@@ -1,27 +1,27 @@
+// src/hooks/banner/useBanner.js
 import { useEffect, useState } from "react";
-import { fetchBanners } from "../../services/bannerService";
+import axios from "axios";
+import { API_URL, API_KEY } from "../../config/env";
 
 export default function useBanner() {
   const [banners, setBanners] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const getBanners = async () => {
-    setLoading(true);
-    try {
-      const data = await fetchBanners();
-      setBanners(data);
-    } catch (err) {
-      console.error("Failed to load banners:", err);
-      setError("Failed to load banners");
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
-    getBanners();
+    axios
+      .get(`${API_URL}/banners`, {
+        headers: { apiKey: API_KEY },
+      })
+      .then((res) => {
+        setBanners(res.data.data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        setError("Gagal memuat banner");
+        setLoading(false);
+      });
   }, []);
 
-  return { banners, loading, error, getBanners };
+  return { banners, loading, error };
 }
