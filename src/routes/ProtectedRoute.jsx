@@ -3,15 +3,18 @@ import { Navigate } from "react-router-dom";
 import Cookies from "js-cookie";
 
 export default function ProtectedRoute({ children, allowedRole }) {
-  //   const userCookie = Cookies.get("user");
+  const token = Cookies.get("token");
+  const role = Cookies.get("role");
 
-  //   if (!userCookie) return <Navigate to="/login" />;
+  if (!token) {
+    return <Navigate to="/login" replace />;
+  }
 
-  //   const user = JSON.parse(userCookie);
+  if (allowedRole && role !== allowedRole) {
+    alert("❌ Kamu tidak memiliki akses ke halaman ini.");
 
-  //   if (allowedRole && user.role !== allowedRole) {
-  //     return <Navigate to="/login" />;
-  //   }
+    return role === "admin" ? <Navigate to="/admin/dashboard" replace /> : <Navigate to="/user/dashboard" replace />;
+  }
 
   return children;
 }

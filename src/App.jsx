@@ -10,6 +10,10 @@ import RegisterPage from "./pages/RegisterPage";
 import ManageUser from "./pages/admin/ManageUser";
 import AdminBannerPage from "./pages/admin/AdminBannerPage";
 import AdminPromoPage from "./pages/admin/AdminPromoPage";
+import AdminCategoryPage from "./pages/admin/AdminCategoryPage";
+import ActivityAdminPage from "./pages/admin/ActivityAdminPage";
+import ProfilePage from "./pages/user/ProfilePage";
+import TransactionStatusAdminPage from "./pages/admin/TransactionStatusAdminPage";
 
 function App() {
   return (
@@ -43,6 +47,17 @@ function App() {
       />
 
       <Route
+        path="/admin/profile"
+        element={
+          <ProtectedRoute allowedRole="admin">
+            <AdminLayout>
+              <ProfilePage />
+            </AdminLayout>
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
         path="/admin/banner"
         element={
           <ProtectedRoute allowedRole="admin">
@@ -59,6 +74,39 @@ function App() {
           <ProtectedRoute allowedRole="admin">
             <AdminLayout>
               <AdminPromoPage />
+            </AdminLayout>
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/admin/category"
+        element={
+          <ProtectedRoute allowedRole="admin">
+            <AdminLayout>
+              <AdminCategoryPage />
+            </AdminLayout>
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/admin/activities"
+        element={
+          <ProtectedRoute allowedRole="admin">
+            <AdminLayout>
+              <ActivityAdminPage />
+            </AdminLayout>
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/admin/transaction"
+        element={
+          <ProtectedRoute allowedRole="admin">
+            <AdminLayout>
+              <TransactionStatusAdminPage />
             </AdminLayout>
           </ProtectedRoute>
         }

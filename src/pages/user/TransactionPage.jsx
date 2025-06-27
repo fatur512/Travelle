@@ -82,28 +82,6 @@ export default function TransactionPage() {
                       >
                         {trx.status}
                       </span>
-
-                      {trx.status === "pending" && (
-                        <div className="mt-3 space-y-2">
-                          <input
-                            type="text"
-                            ref={(el) => (inputRefs.current[trx.id] = el)}
-                            placeholder="Tempel URL bukti pembayaran"
-                            className="w-full px-3 py-1 text-sm border border-gray-300 rounded-md"
-                          />
-                          <button
-                            onClick={() => handleSubmitUrl(trx.id)}
-                            disabled={submittingId === trx.id}
-                            className={`w-full px-3 py-1 text-xs text-white rounded ${
-                              submittingId === trx.id
-                                ? "bg-gray-400 cursor-not-allowed"
-                                : "bg-blue-600 hover:bg-blue-700"
-                            }`}
-                          >
-                            {submittingId === trx.id ? "Mengirim..." : "Kirim Bukti Pembayaran"}
-                          </button>
-                        </div>
-                      )}
                     </td>
                     <td className="px-6 py-5">
                       <div className="space-y-2">

@@ -3,12 +3,7 @@ import { useCart } from "../../context/CartContext";
 import { Link, useNavigate } from "react-router-dom";
 
 export default function UserCartPage() {
-  const {
-    carts,
-    loading,
-    removeFromCart,
-    updateQuantity, // ✅ gunakan ini
-  } = useCart();
+  const { carts, loading, removeFromCart, updateQuantity } = useCart();
 
   const [selectedItems, setSelectedItems] = useState([]);
   const [updatingId, setUpdatingId] = useState(null);
@@ -26,11 +21,15 @@ export default function UserCartPage() {
   };
 
   const handleQuantityChange = async (itemId, newQuantity) => {
-    if (newQuantity < 1) return;
+    if (newQuantity < 1) {
+      // ➕ jika quantity di bawah 1, hapus item
+      removeFromCart(itemId);
+      return;
+    }
 
     setUpdatingId(itemId);
     try {
-      await updateQuantity(itemId, newQuantity); // ✅ gunakan ini
+      await updateQuantity(itemId, newQuantity);
       console.log("✅ Update sukses");
     } catch (error) {
       console.error("❌ Gagal update quantity:", error);
@@ -76,6 +75,7 @@ export default function UserCartPage() {
         <p className="text-center text-gray-600">Your cart is empty.</p>
       ) : (
         <div className="max-w-4xl mx-auto space-y-4">
+          {/* ✅ Select All */}
           <div className="flex items-center gap-2 p-2 bg-white shadow rounded-xl">
             <input
               type="checkbox"
@@ -86,6 +86,7 @@ export default function UserCartPage() {
             <label className="text-sm font-medium text-gray-700">Pilih Semua</label>
           </div>
 
+          {/* ✅ List Cart Items */}
           {carts
             .filter((item) => item.activity)
             .map((item) => {
@@ -129,7 +130,7 @@ export default function UserCartPage() {
                     <div className="flex items-center gap-2 mt-2">
                       <button
                         onClick={() => handleQuantityChange(item.id, quantity - 1)}
-                        disabled={quantity <= 1 || updatingId === item.id}
+                        disabled={updatingId === item.id}
                         className="px-2 py-1 text-sm text-white bg-gray-500 rounded hover:bg-gray-600 disabled:opacity-50"
                       >
                         -
@@ -161,6 +162,7 @@ export default function UserCartPage() {
               );
             })}
 
+          {/* ✅ Checkout Section */}
           <div className="p-4 space-y-4 bg-white shadow rounded-xl">
             <div className="flex justify-between text-lg font-bold text-gray-800">
               <span>Total yang Dipilih:</span>
@@ -169,11 +171,17 @@ export default function UserCartPage() {
 
             <button
               onClick={handleCheckout}
-              className="w-full px-4 py-2 font-semibold text-white bg-blue-600 rounded hover:bg-blue-700"
               disabled={selectedItems.length === 0}
+              className={`w-full px-4 py-2 font-semibold text-white rounded transition ${
+                selectedItems.length === 0 ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"
+              }`}
             >
               Checkout
             </button>
+
+            {selectedItems.length === 0 && (
+              <p className="text-sm text-center text-gray-500">Silakan pilih item terlebih dahulu sebelum checkout.</p>
+            )}
           </div>
         </div>
       )}
