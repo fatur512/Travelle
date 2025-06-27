@@ -5,7 +5,7 @@ import useActivities from "../../hooks/activities/useActivities";
 import UserDashboardTopCategories from "./userDashboardCategories";
 import { Link } from "react-router-dom";
 
-export default function UserDashboard() {
+export default function HomeDashboard() {
   const { banners, loading: bannerLoading } = useBanner();
   const { promos, loading: promoLoading } = usePromo();
   const { activities, loading, error } = useActivities();
