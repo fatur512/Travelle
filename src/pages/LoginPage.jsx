@@ -14,7 +14,7 @@ export default function LoginPage() {
     const result = await getLogin(email, password);
     if (result?.data?.role) {
       const role = result.data.role;
-      navigate(role === "admin" ? "/admin" : "/");
+      navigate(role === "admin" ? "/admin/users" : "/");
     }
   };
 

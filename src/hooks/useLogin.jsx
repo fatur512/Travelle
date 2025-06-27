@@ -1,8 +1,6 @@
-// src/hooks/useLogin.js
-import axios from "axios";
 import { useState } from "react";
+import { loginService } from "../services/LoginService"; // Adjust path to where loginService is defined
 import Cookies from "js-cookie";
-import { API_URL, API_KEY } from "../config/env";
 
 export default function useLogin() {
   const [error, setError] = useState("");
@@ -16,23 +14,9 @@ export default function useLogin() {
     setSuccess("");
 
     try {
-      const res = await axios.post(
-        `${API_URL}/login`,
-        { email, password },
-        {
-          headers: {
-            apiKey: API_KEY,
-          },
-        }
-      );
+      const { token, data } = await loginService(email, password);
 
-      const { token, data } = res.data;
-
-      if (!token || !data) throw new Error("Login gagal. Token tidak valid.");
-
-      Cookies.set("token", token, { expires: 7 });
-      Cookies.set("isLoggedIn", "true", { expires: 7 });
-      Cookies.set("user", JSON.stringify(data), { expires: 7 });
+      // Set additional cookies specific to the hook's needs
       Cookies.set("role", data.role, { expires: 7 });
       Cookies.set("userId", data.id, { expires: 7 });
 
@@ -41,17 +25,25 @@ export default function useLogin() {
 
       setUser(data);
       setSuccess("Login berhasil!");
-      return res.data;
+      return { token, data };
     } catch (err) {
       let errorMessage = "Gagal login. Cek email & password.";
-      if (err.response?.status === 401) {
-        errorMessage = "Email atau kata sandi salah.";
-      } else if (err.response?.data?.message) {
-        errorMessage = err.response.data.message;
+      if (err.response) {
+        if (err.response.status === 401) {
+          errorMessage = "Email atau kata sandi salah.";
+        } else if (err.response.status === 404) {
+          errorMessage = "API login tidak ditemukan. Periksa URL API.";
+        } else if (err.response.data?.message) {
+          errorMessage = err.response.data.message;
+        }
+      } else if (err.request) {
+        errorMessage = "Tidak ada respons dari server. Periksa koneksi.";
       }
 
       setError(errorMessage);
       console.error("❌ Login error:", err);
+      console.error("Request URL:", err.config?.url || "Unknown URL");
+      console.error("Response:", err.response?.data);
       return null;
     } finally {
       setLoading(false);
