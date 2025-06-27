@@ -23,7 +23,7 @@ export default function LoginPage() {
     const userCookie = Cookies.get("user");
     if (isLoggedIn && userCookie) {
       const role = JSON.parse(userCookie)?.role;
-      navigate(role === "admin" ? "/admin/dashboard" : "/user/profile");
+      navigate(role === "admin" ? "/admin/banner" : "/user/profile");
     }
   }, [navigate]);
 

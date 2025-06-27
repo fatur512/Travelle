@@ -9,7 +9,8 @@ function isValidHttpUrl(url) {
   try {
     const parsed = new URL(url);
     return parsed.protocol === "http:" || parsed.protocol === "https:";
-  } catch (_) {
+  } catch (err) {
+    console.error("Invalid URL:", url, err);
     return false;
   }
 }

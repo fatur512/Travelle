@@ -91,6 +91,16 @@ export default function ActivityAdminPage() {
     setEditingId(null);
   };
 
+  const handleFileUpload = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setForm({ ...form, imageUrl: reader.result });
+    };
+    reader.readAsDataURL(file);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const payload = {
@@ -196,13 +206,14 @@ export default function ActivityAdminPage() {
                   className="w-full px-3 py-2 border rounded"
                 />
                 <input
-                  type="url"
-                  placeholder="URL Gambar"
-                  value={form.imageUrl}
-                  onChange={(e) => setForm({ ...form, imageUrl: e.target.value })}
-                  required
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileUpload}
                   className="w-full px-3 py-2 border rounded"
                 />
+                {form.imageUrl && (
+                  <img src={form.imageUrl} alt="Preview" className="object-cover w-full h-40 rounded-md" />
+                )}
                 <input
                   type="number"
                   placeholder="Harga"
