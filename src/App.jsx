@@ -3,7 +3,7 @@ import { Routes, Route, BrowserRouter } from "react-router-dom";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import AdminLayout from "./layouts/AdminLayout";
 import UserLayout from "./layouts/UserLayout";
-import UserDashboard from "./pages/user/userDashboard";
+import UserDashboard from "./pages/user/UserDashboard.jsx";
 import LoginPage from "./pages/LoginPage";
 import UserRoutes from "./routes/UserRoutes";
 import RegisterPage from "./pages/RegisterPage";
