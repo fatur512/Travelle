@@ -12,7 +12,7 @@ import AdminCategoryPage from "./pages/admin/AdminCategoryPage";
 import ActivityAdminPage from "./pages/admin/ActivityAdminPage";
 import ProfilePage from "./pages/user/ProfilePage";
 import TransactionStatusAdminPage from "./pages/admin/TransactionStatusAdminPage";
-import UserDashboard from "./pages/user/userDashboard";
+import SomeComponent from "./pages/user/userDashboard";
 
 function App() {
   return (
