@@ -1,5 +1,5 @@
 import React from "react";
-import { Routes, Route, BrowserRouter } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import AdminLayout from "./layouts/AdminLayout";
 import UserLayout from "./layouts/UserLayout";
@@ -7,7 +7,6 @@ import LoginPage from "./pages/LoginPage";
 import UserRoutes from "./routes/UserRoutes";
 import RegisterPage from "./pages/RegisterPage";
 import ManageUser from "./pages/admin/ManageUser";
-import AdminBannerPage from "./pages/admin/AdminBannerPage";
 import AdminPromoPage from "./pages/admin/AdminPromoPage";
 import AdminCategoryPage from "./pages/admin/AdminCategoryPage";
 import ActivityAdminPage from "./pages/admin/ActivityAdminPage";
