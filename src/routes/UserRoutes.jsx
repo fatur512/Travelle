@@ -14,6 +14,7 @@ import PromoPage from "../pages/user/PromoPage";
 import CheckOutPage from "../pages/user/CheckOutPage";
 import TransactionPage from "../pages/user/TransactionPage";
 import UserCartPage from "../pages/user/userCartPage";
+import HomeDashboard from "../pages/user/HomeDashboard";
 
 export default function UserRoutes() {
   return (
@@ -24,7 +25,7 @@ export default function UserRoutes() {
         element={
           <ProtectedRoute allowedRole="user">
             <UserLayout>
-              <UserDashboard />
+              <HomeDashboard />
             </UserLayout>
           </ProtectedRoute>
         }
