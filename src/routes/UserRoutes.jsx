@@ -8,7 +8,6 @@ import CategoryListPage from "../pages/user/CategoryListPage";
 import CategoryDetailPage from "../pages/user/CategoryDetailPage";
 import ActivityListPage from "../pages/user/ActivityListPage";
 import ActivityDetailPage from "../pages/user/ActivityDetailPage";
-import UserDashboard from "../pages/user/HomeDashboard";
 import BannerPage from "../pages/user/BannerPage";
 import PromoPage from "../pages/user/PromoPage";
 import CheckOutPage from "../pages/user/CheckOutPage";
