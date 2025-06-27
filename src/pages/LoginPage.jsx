@@ -14,11 +14,7 @@ export default function LoginPage() {
     const result = await getLogin(email, password);
     if (result?.data?.role) {
       const role = result.data.role;
-      if (role === "admin") {
-        navigate("/admin/dashboard");
-      } else {
-        navigate("/");
-      }
+      navigate(role === "admin" ? "/admin" : "/");
     }
   };
 
@@ -27,76 +23,78 @@ export default function LoginPage() {
     const userCookie = Cookies.get("user");
     if (isLoggedIn && userCookie) {
       const role = JSON.parse(userCookie)?.role;
-      if (role === "admin") {
-        navigate("/admin/dashboard");
-      } else {
-        navigate("/user/profile");
-      }
+      navigate(role === "admin" ? "/admin/dashboard" : "/user/profile");
     }
   }, [navigate]);
 
   return (
-    <div
-      className="flex items-center justify-end min-h-screen bg-center bg-cover"
-      style={{
-        backgroundImage:
-          "url('https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1350&q=80')",
-      }}
-    >
-      <div className="w-full mt-20 max-w-md p-8 bg-white shadow-lg mr-50 min-h-[610px] bg-opacity-90 rounded-xl">
-        <h2 className="mb-6 text-2xl font-semibold text-center text-gray-800">Masuk ke Akun Anda</h2>
+    <div className="flex flex-col min-h-screen md:flex-row bg-gradient-to-r from-sky-100 via-blue-50 to-white">
+      {/* Mobile Branding */}
+      <div className="flex flex-col items-center justify-center px-6 py-10 text-center md:hidden">
+        <h1 className="mb-2 text-3xl font-extrabold text-blue-700">Travelle</h1>
+        <p className="mb-4 text-sm font-medium text-blue-800">Gabung dan rencanakan liburan terbaikmu. 🏝️</p>
+      </div>
 
-        <form className="space-y-5" onSubmit={handleSubmit}>
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-              Email
-            </label>
+      {/* Desktop Branding */}
+      <div className="flex-col justify-center hidden w-1/2 px-12 bg-white shadow-md md:flex rounded-r-3xl">
+        <div className="max-w-md">
+          <h1 className="mb-4 text-4xl font-extrabold text-blue-600">Travelle</h1>
+          <p className="mb-6 text-xl font-light leading-relaxed text-gray-700">
+            Gabung dan rencanakan liburan terbaikmu. <br />
+            ✈️ Tiket murah, hotel nyaman, dan petualangan seru – semua di satu tempat!
+          </p>
+          <img
+            src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1000&q=80"
+            alt="Travel"
+            className="w-full shadow-lg rounded-xl"
+          />
+        </div>
+      </div>
+
+      {/* Login Form */}
+      <div className="flex items-center justify-center w-full px-6 md:w-1/2">
+        <div className="w-full max-w-md p-8 bg-white shadow-2xl rounded-2xl animate-fade-in">
+          <h2 className="mb-6 text-2xl font-semibold text-center text-gray-800">Masuk ke Travelle</h2>
+
+          <form className="space-y-4" onSubmit={handleSubmit}>
             <input
-              id="email"
               type="email"
+              placeholder="Email"
+              className="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              placeholder="example@gmail.com"
-              className="w-full px-4 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
             />
-          </div>
-
-          <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-              Kata Sandi
-            </label>
             <input
-              id="password"
               type="password"
+              placeholder="Kata Sandi"
+              className="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              placeholder="••••••••"
-              className="w-full px-4 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
             />
-          </div>
 
-          {error && <p className="text-sm text-center text-red-600">{error}</p>}
-          {success && <p className="text-sm text-center text-green-600">{success}</p>}
+            {error && <p className="text-sm text-center text-red-600">{error}</p>}
+            {success && <p className="text-sm text-center text-green-600">{success}</p>}
 
-          <button
-            type="submit"
-            disabled={loading}
-            className={`w-full px-4 py-2 font-semibold text-white rounded-md ${
-              loading ? "bg-gray-400 cursor-not-allowed" : "bg-indigo-600 hover:bg-indigo-700"
-            }`}
-          >
-            {loading ? "Memproses..." : "Masuk"}
-          </button>
+            <button
+              type="submit"
+              disabled={loading}
+              className={`w-full px-4 py-2 font-semibold text-white rounded-md transition ${
+                loading ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"
+              }`}
+            >
+              {loading ? "Memproses..." : "Masuk"}
+            </button>
 
-          <p className="mt-4 text-sm text-center text-gray-500">
-            Belum punya akun?{" "}
-            <Link to="/register" className="text-indigo-600 cursor-pointer hover:underline">
-              Daftar sekarang
-            </Link>
-          </p>
-        </form>
+            <p className="text-sm text-center text-gray-600">
+              Belum punya akun?{" "}
+              <span className="text-blue-600 cursor-pointer hover:underline" onClick={() => navigate("/register")}>
+                Daftar sekarang
+              </span>
+            </p>
+          </form>
+        </div>
       </div>
     </div>
   );

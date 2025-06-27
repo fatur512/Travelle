@@ -3,8 +3,7 @@ import { Routes, Route } from "react-router-dom";
 import UserLayout from "../layouts/UserLayout";
 import ProtectedRoute from "./ProtectedRoute";
 
-import ProfilePage from "../pages/user/ProfilePage";
-import UserCartPage from "../pages/user/UserCartPage"; // Tambahkan
+import ProfilePage from "../pages/user/ProfilePage"; // Tambahkan
 import CategoryListPage from "../pages/user/CategoryListPage";
 import CategoryDetailPage from "../pages/user/CategoryDetailPage";
 import ActivityListPage from "../pages/user/ActivityListPage";
@@ -14,6 +13,7 @@ import BannerPage from "../pages/user/BannerPage";
 import PromoPage from "../pages/user/PromoPage";
 import CheckOutPage from "../pages/user/CheckOutPage";
 import TransactionPage from "../pages/user/TransactionPage";
+import UserCartPage from "../pages/user/userCartPage";
 
 export default function UserRoutes() {
   return (
