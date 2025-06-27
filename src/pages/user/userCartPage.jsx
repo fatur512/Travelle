@@ -3,8 +3,15 @@ import { useCart } from "../../context/CartContext";
 import { Link, useNavigate } from "react-router-dom";
 
 export default function UserCartPage() {
-  const { carts, loading, removeFromCart, updateQuantity, decreaseQuantity } = useCart();
+  const {
+    carts,
+    loading,
+    removeFromCart,
+    updateQuantity, // ✅ gunakan ini
+  } = useCart();
+
   const [selectedItems, setSelectedItems] = useState([]);
+  const [updatingId, setUpdatingId] = useState(null);
   const navigate = useNavigate();
 
   const isAllSelected = carts.length > 0 && selectedItems.length === carts.length;
@@ -14,11 +21,22 @@ export default function UserCartPage() {
   };
 
   const handleSelectAll = () => {
-    if (isAllSelected) {
-      setSelectedItems([]);
-    } else {
-      const allIds = carts.map((item) => item.id);
-      setSelectedItems(allIds);
+    const allIds = carts.map((item) => item.id);
+    setSelectedItems(isAllSelected ? [] : allIds);
+  };
+
+  const handleQuantityChange = async (itemId, newQuantity) => {
+    if (newQuantity < 1) return;
+
+    setUpdatingId(itemId);
+    try {
+      await updateQuantity(itemId, newQuantity); // ✅ gunakan ini
+      console.log("✅ Update sukses");
+    } catch (error) {
+      console.error("❌ Gagal update quantity:", error);
+      alert("Gagal memperbarui jumlah item.");
+    } finally {
+      setUpdatingId(null);
     }
   };
 
@@ -36,7 +54,6 @@ export default function UserCartPage() {
       return;
     }
 
-    // Navigasi ke halaman checkout dan kirim data lewat state
     navigate("/checkout", {
       state: {
         items: selectedCartItems,
@@ -59,7 +76,6 @@ export default function UserCartPage() {
         <p className="text-center text-gray-600">Your cart is empty.</p>
       ) : (
         <div className="max-w-4xl mx-auto space-y-4">
-          {/* Select All Checkbox */}
           <div className="flex items-center gap-2 p-2 bg-white shadow rounded-xl">
             <input
               type="checkbox"
@@ -70,7 +86,6 @@ export default function UserCartPage() {
             <label className="text-sm font-medium text-gray-700">Pilih Semua</label>
           </div>
 
-          {/* Item List */}
           {carts
             .filter((item) => item.activity)
             .map((item) => {
@@ -92,7 +107,6 @@ export default function UserCartPage() {
                     className="w-5 h-5 text-blue-600"
                   />
 
-                  {/* Gambar aktivitas */}
                   {imageUrl ? (
                     <img
                       src={imageUrl}
@@ -106,7 +120,6 @@ export default function UserCartPage() {
                     </div>
                   )}
 
-                  {/* Info aktivitas */}
                   <div className="flex-1">
                     <Link to={`/activity/${activity.id}`}>
                       <h4 className="text-lg font-bold text-blue-700 hover:underline">{activity.title}</h4>
@@ -115,22 +128,25 @@ export default function UserCartPage() {
 
                     <div className="flex items-center gap-2 mt-2">
                       <button
-                        onClick={() => decreaseQuantity(item.id)}
-                        disabled={quantity <= 1}
+                        onClick={() => handleQuantityChange(item.id, quantity - 1)}
+                        disabled={quantity <= 1 || updatingId === item.id}
                         className="px-2 py-1 text-sm text-white bg-gray-500 rounded hover:bg-gray-600 disabled:opacity-50"
                       >
                         -
                       </button>
                       <span className="px-2 text-base font-medium">{quantity}</span>
                       <button
-                        onClick={() => updateQuantity(item.id, quantity + 1)}
+                        onClick={() => handleQuantityChange(item.id, quantity + 1)}
+                        disabled={updatingId === item.id}
                         className="px-2 py-1 text-sm text-white bg-gray-700 rounded hover:bg-gray-800"
                       >
                         +
                       </button>
                     </div>
 
-                    <p className="mt-2 text-sm font-bold text-blue-600">Rp {activity.price?.toLocaleString("id-ID")}</p>
+                    <p className="mt-2 text-sm font-bold text-blue-600">
+                      Rp {activity.price?.toLocaleString("id-ID") || 0}
+                    </p>
                   </div>
 
                   <div>
@@ -145,11 +161,10 @@ export default function UserCartPage() {
               );
             })}
 
-          {/* Total & Checkout */}
           <div className="p-4 space-y-4 bg-white shadow rounded-xl">
             <div className="flex justify-between text-lg font-bold text-gray-800">
               <span>Total yang Dipilih:</span>
-              <span>Rp {totalSelectedPrice.toLocaleString("id-ID")}</span>
+              <span>Rp {totalSelectedPrice.toLocaleString("id-ID") || 0}</span>
             </div>
 
             <button

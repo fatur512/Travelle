@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import usePaymentMethods from "../../hooks/paymentMethod/usePaymentMethods";
 import { uploadTransactionImage } from "../../services/uploadService";
 import { useLocation, useNavigate } from "react-router-dom";
+import { createTransaction } from "../../services/transactionService";
 
 export default function CheckOutPage() {
   const { paymentMethods, loading: paymentLoading, error } = usePaymentMethods();
@@ -31,14 +32,9 @@ export default function CheckOutPage() {
     }
   };
 
-  const handleCheckout = () => {
+  const handleCheckout = async () => {
     if (!selectedPayment) {
       alert("Silakan pilih metode pembayaran terlebih dahulu.");
-      return;
-    }
-
-    if (!proofImageUrl) {
-      alert("Silakan upload bukti pembayaran terlebih dahulu.");
       return;
     }
 
@@ -47,16 +43,19 @@ export default function CheckOutPage() {
       return;
     }
 
-    // Kirim ke backend (jika ada)
-    console.log({
-      items,
-      total,
-      paymentMethodId: selectedPayment,
-      proofImageUrl,
-    });
+    const cartIds = items.map((item) => item.id); // Ambil id keranjang saja
 
-    alert("Checkout berhasil! Bukti pembayaran telah dikirim.");
-    navigate("/"); // Redirect ke home
+    try {
+      await createTransaction({
+        cartIds,
+        paymentMethodId: selectedPayment,
+      });
+
+      alert("Checkout berhasil! Transaksi dikirim ke backend.");
+      navigate("/my-transactions");
+    } catch (error) {
+      alert("Gagal melakukan checkout. Silakan coba lagi.");
+    }
   };
 
   // Jika tidak ada data dari location.state

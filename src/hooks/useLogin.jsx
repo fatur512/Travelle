@@ -1,6 +1,8 @@
+// src/hooks/useLogin.js
 import axios from "axios";
 import { useState } from "react";
 import Cookies from "js-cookie";
+import { API_URL, API_KEY } from "../config/env";
 
 export default function useLogin() {
   const [error, setError] = useState("");
@@ -15,25 +17,29 @@ export default function useLogin() {
 
     try {
       const res = await axios.post(
-        "https://travel-journal-api-bootcamp.do.dibimbing.id/api/v1/login",
+        `${API_URL}/login`,
         { email, password },
         {
           headers: {
-            apiKey: "24405e01-fbc1-45a5-9f5a-be13afcd757c",
+            apiKey: API_KEY,
           },
         }
       );
 
       const { token, data } = res.data;
 
+      if (!token || !data) throw new Error("Login gagal. Token tidak valid.");
+
       Cookies.set("token", token, { expires: 7 });
       Cookies.set("isLoggedIn", "true", { expires: 7 });
+      Cookies.set("user", JSON.stringify(data), { expires: 7 });
+      Cookies.set("role", data.role, { expires: 7 });
+      Cookies.set("userId", data.id, { expires: 7 });
 
-      if (data) {
-        setUser(data);
-        Cookies.set("user", JSON.stringify(data), { expires: 7 });
-      }
+      console.log("✅ Login berhasil sebagai:", data.email);
+      console.log("🔐 Token:", token);
 
+      setUser(data);
       setSuccess("Login berhasil!");
       return res.data;
     } catch (err) {
@@ -43,8 +49,9 @@ export default function useLogin() {
       } else if (err.response?.data?.message) {
         errorMessage = err.response.data.message;
       }
+
       setError(errorMessage);
-      console.error("Login error:", err);
+      console.error("❌ Login error:", err);
       return null;
     } finally {
       setLoading(false);

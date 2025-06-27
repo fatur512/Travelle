@@ -1,6 +1,11 @@
 // src/context/CartContext.jsx
 import React, { createContext, useContext, useEffect, useState } from "react";
-import { fetchCarts } from "../services/cartService";
+import {
+  fetchCarts,
+  deleteCart,
+  updateCartQuantity, // ✅ Import API service
+} from "../services/cartService";
+import Cookies from "js-cookie";
 
 const CartContext = createContext();
 
@@ -24,20 +29,47 @@ export function CartProvider({ children }) {
     setCarts((prev) => [...prev, item]);
   };
 
-  const decreaseQuantity = (id) => {
-    setCarts((prevCarts) =>
-      prevCarts.map((item) => (item.id === id ? { ...item, quantity: Math.max(1, (item.quantity || 1) - 1) } : item))
-    );
+  const updateQuantity = async (id, newQuantity) => {
+    console.log("⚙️ updateQuantity called", { id, newQuantity });
+    try {
+      const safeQuantity = Math.max(1, newQuantity);
+      await updateCartQuantity(id, safeQuantity); // call yang sudah diperbaiki
+      await loadCarts();
+    } catch (err) {
+      console.error("❌ updateQuantity gagal:", err);
+      alert("Gagal memperbarui jumlah item.");
+    }
   };
 
-  const removeFromCart = (id) => {
-    setCarts((prev) => prev.filter((item) => item.id !== id));
+  const decreaseQuantity = async (id) => {
+    const item = carts.find((c) => c.id === id);
+    const currentQty = item?.quantity || 1;
+    if (currentQty <= 1) return;
+
+    try {
+      await updateCartQuantity(id, currentQty - 1); // ✅ Update ke backend
+      await loadCarts();
+    } catch (err) {
+      console.error("Gagal mengurangi quantity:", err);
+    }
   };
 
-  const updateQuantity = (id, newQuantity) => {
-    setCarts((prevCarts) =>
-      prevCarts.map((item) => (item.id === id ? { ...item, quantity: Math.max(1, newQuantity) } : item))
-    );
+  const removeFromCart = async (id) => {
+    try {
+      const token = Cookies.get("token");
+      await deleteCart(id, token);
+      await loadCarts(); // Sync ulang data dari server
+    } catch (error) {
+      console.error("Gagal menghapus cart dari server:", error);
+    }
+  };
+
+  const toggleItemCheck = (id) => {
+    setCarts((prevCarts) => prevCarts.map((item) => (item.id === id ? { ...item, isChecked: !item.isChecked } : item)));
+  };
+
+  const toggleAllItemsCheck = (checked) => {
+    setCarts((prevCarts) => prevCarts.map((item) => ({ ...item, isChecked: checked })));
   };
 
   useEffect(() => {
@@ -51,9 +83,11 @@ export function CartProvider({ children }) {
         loading,
         addToCart,
         removeFromCart,
-        updateQuantity,
-        decreaseQuantity,
+        updateQuantity, // untuk tombol `+`
+        decreaseQuantity, // untuk tombol `-`
         loadCarts,
+        toggleItemCheck,
+        toggleAllItemsCheck,
       }}
     >
       {children}
