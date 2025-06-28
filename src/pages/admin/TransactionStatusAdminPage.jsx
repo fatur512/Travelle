@@ -4,6 +4,7 @@ import { allTransactions, updateTransactionStatus, deleteTransaction } from "../
 export default function TransactionStatusAdminPage() {
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedStatus, setSelectedStatus] = useState({}); // Menyimpan pilihan status tiap transaksi
 
   const loadTransactions = async () => {
     setLoading(true);
@@ -21,14 +22,32 @@ export default function TransactionStatusAdminPage() {
     loadTransactions();
   }, []);
 
-  const handleStatusChange = async (id, currentStatus, newStatus) => {
-    if (currentStatus !== "PENDING") {
+  const handleStatusChange = (id, status) => {
+    setSelectedStatus((prev) => ({
+      ...prev,
+      [id]: status,
+    }));
+  };
+
+  const handleUpdateStatus = async (id, currentStatus) => {
+    const newStatus = selectedStatus[id];
+    if (!newStatus) {
+      alert("Silakan pilih status terlebih dahulu.");
+      return;
+    }
+
+    if (currentStatus !== "PENDING" && newStatus !== currentStatus) {
       alert("Status hanya dapat diubah jika saat ini adalah 'PENDING'.");
       return;
     }
+
     try {
       await updateTransactionStatus(id, newStatus);
-      alert(`Status berhasil diperbarui menjadi ${newStatus}.`);
+      if (newStatus === "SUCCESS") {
+        alert("Transaksi berhasil dibayar.");
+      } else {
+        alert(`Status berhasil diperbarui menjadi ${newStatus}.`);
+      }
       loadTransactions();
     } catch (err) {
       alert("Gagal update status: " + err.message);
@@ -64,20 +83,22 @@ export default function TransactionStatusAdminPage() {
               <p className="text-gray-600">
                 Metode: {tx.paymentMethod?.type || "-"} - {tx.paymentMethod?.name || "-"}
               </p>
-              <div className="flex gap-2 mt-3">
-                <button
-                  onClick={() => handleStatusChange(tx.id, tx.status, "PAID")}
-                  className="px-3 py-1 text-white bg-green-600 rounded hover:bg-green-700"
-                  disabled={tx.status !== "PENDING"}
+              <div className="flex items-center gap-2 mt-3">
+                <select
+                  value={selectedStatus[tx.id] || ""}
+                  onChange={(e) => handleStatusChange(tx.id, e.target.value)}
+                  className="px-2 py-1 border rounded"
                 >
-                  Set ke PAID
-                </button>
+                  <option value="">-- Pilih Status --</option>
+                  <option value="SUCCESS">SUCCESS</option>
+                  <option value="PENDING">PENDING</option>
+                  <option value="CANCELLED">CANCELLED</option>
+                </select>
                 <button
-                  onClick={() => handleStatusChange(tx.id, tx.status, "CANCELLED")}
-                  className="px-3 py-1 text-white bg-yellow-600 rounded hover:bg-yellow-700"
-                  disabled={tx.status !== "PENDING"}
+                  onClick={() => handleUpdateStatus(tx.id, tx.status)}
+                  className="px-3 py-1 text-white bg-blue-600 rounded hover:bg-blue-700"
                 >
-                  Set ke CANCELLED
+                  Update Status
                 </button>
                 <button
                   onClick={() => handleDelete(tx.id)}
