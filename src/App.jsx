@@ -14,6 +14,7 @@ import TransactionStatusAdminPage from "./pages/admin/TransactionStatusAdminPage
 import HomeDashboard from "./pages/user/HomeDashboard";
 import AdminBannerPage from "./pages/admin/AdminBannerPage";
 import UserRoutes from "./routes/UserRoutes";
+import UserCartPage from "./pages/user/userCartPage";
 
 function App() {
   return (
@@ -30,6 +31,14 @@ function App() {
             <UserLayout>
               <HomeDashboard />
             </UserLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/user/cart"
+        element={
+          <ProtectedRoute allowedRole="user">
+            <UserCartPage />
           </ProtectedRoute>
         }
       />

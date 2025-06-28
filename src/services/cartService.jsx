@@ -42,7 +42,9 @@ export const fetchCarts = async () => {
 // Tambahkan item ke cart
 export const addCartToBackend = async ({ activityId, quantity }) => {
   const token = getToken();
-
+  if (!token) {
+    throw new Error("Kamu belum login");
+  }
   try {
     const res = await axios.post(
       `${API_URL}/add-cart`,
