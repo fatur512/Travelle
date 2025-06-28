@@ -4,13 +4,11 @@ import { Link, useNavigate } from "react-router-dom";
 
 export default function UserCartPage() {
   const { carts, loading, removeFromCart, updateQuantity } = useCart();
-
   const [selectedItems, setSelectedItems] = useState([]);
   const [updatingId, setUpdatingId] = useState(null);
   const navigate = useNavigate();
 
   const isAllSelected = carts.length > 0 && selectedItems.length === carts.length;
-
   const handleCheckboxChange = (itemId) => {
     setSelectedItems((prev) => (prev.includes(itemId) ? prev.filter((id) => id !== itemId) : [...prev, itemId]));
   };
@@ -22,15 +20,12 @@ export default function UserCartPage() {
 
   const handleQuantityChange = async (itemId, newQuantity) => {
     if (newQuantity < 1) {
-      // ➕ jika quantity di bawah 1, hapus item
       removeFromCart(itemId);
       return;
     }
-
     setUpdatingId(itemId);
     try {
       await updateQuantity(itemId, newQuantity);
-      console.log("✅ Update sukses");
     } catch (error) {
       console.error("❌ Gagal update quantity:", error);
       alert("Gagal memperbarui jumlah item.");
@@ -40,7 +35,6 @@ export default function UserCartPage() {
   };
 
   const selectedCartItems = carts.filter((item) => selectedItems.includes(item.id));
-
   const totalSelectedPrice = selectedCartItems.reduce((acc, item) => {
     const price = typeof item.activity?.price === "number" ? item.activity.price : 0;
     const qty = item.quantity || 1;
@@ -52,11 +46,11 @@ export default function UserCartPage() {
       alert("Silakan pilih item yang ingin di-checkout.");
       return;
     }
-
     navigate("/checkout", {
       state: {
         items: selectedCartItems,
         total: totalSelectedPrice,
+        cartIds: selectedItems, // ✅ Kirim cartIds
       },
     });
   };
@@ -66,7 +60,6 @@ export default function UserCartPage() {
       <Link to="/" className="text-blue-600 hover:underline">
         ← Back to Home
       </Link>
-
       <h2 className="mb-6 text-3xl font-bold text-center text-gray-800">Your Cart ({carts.length} items)</h2>
 
       {loading ? (
@@ -75,7 +68,6 @@ export default function UserCartPage() {
         <p className="text-center text-gray-600">Your cart is empty.</p>
       ) : (
         <div className="max-w-4xl mx-auto space-y-4">
-          {/* ✅ Select All */}
           <div className="flex items-center gap-2 p-2 bg-white shadow rounded-xl">
             <input
               type="checkbox"
@@ -86,7 +78,6 @@ export default function UserCartPage() {
             <label className="text-sm font-medium text-gray-700">Pilih Semua</label>
           </div>
 
-          {/* ✅ List Cart Items */}
           {carts
             .filter((item) => item.activity)
             .map((item) => {
@@ -107,14 +98,8 @@ export default function UserCartPage() {
                     onChange={() => handleCheckboxChange(item.id)}
                     className="w-5 h-5 text-blue-600"
                   />
-
                   {imageUrl ? (
-                    <img
-                      src={imageUrl}
-                      alt={activity.title || "Image"}
-                      className="object-cover w-24 h-24 rounded"
-                      onError={(e) => (e.target.style.display = "none")}
-                    />
+                    <img src={imageUrl} alt={activity.title || "Image"} className="object-cover w-24 h-24 rounded" />
                   ) : (
                     <div className="flex items-center justify-center w-24 h-24 text-sm text-gray-500 bg-gray-200 rounded">
                       No Image
@@ -126,7 +111,6 @@ export default function UserCartPage() {
                       <h4 className="text-lg font-bold text-blue-700 hover:underline">{activity.title}</h4>
                     </Link>
                     <p className="text-sm text-gray-600 line-clamp-2">{activity.description}</p>
-
                     <div className="flex items-center gap-2 mt-2">
                       <button
                         onClick={() => handleQuantityChange(item.id, quantity - 1)}
@@ -144,7 +128,6 @@ export default function UserCartPage() {
                         +
                       </button>
                     </div>
-
                     <p className="mt-2 text-sm font-bold text-blue-600">
                       Rp {activity.price?.toLocaleString("id-ID") || 0}
                     </p>
@@ -162,7 +145,6 @@ export default function UserCartPage() {
               );
             })}
 
-          {/* ✅ Checkout Section */}
           <div className="p-4 space-y-4 bg-white shadow rounded-xl">
             <div className="flex justify-between text-lg font-bold text-gray-800">
               <span>Total yang Dipilih:</span>

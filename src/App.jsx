@@ -4,7 +4,6 @@ import ProtectedRoute from "./routes/ProtectedRoute";
 import AdminLayout from "./layouts/AdminLayout";
 import UserLayout from "./layouts/UserLayout";
 import LoginPage from "./pages/LoginPage";
-import UserRoutes from "./routes/UserRoutes";
 import RegisterPage from "./pages/RegisterPage";
 import ManageUser from "./pages/admin/ManageUser";
 import AdminPromoPage from "./pages/admin/AdminPromoPage";
@@ -14,14 +13,16 @@ import ProfilePage from "./pages/user/ProfilePage";
 import TransactionStatusAdminPage from "./pages/admin/TransactionStatusAdminPage";
 import HomeDashboard from "./pages/user/HomeDashboard";
 import AdminBannerPage from "./pages/admin/AdminBannerPage";
+import UserRoutes from "./routes/UserRoutes";
 
 function App() {
   return (
     <Routes>
-      {/* Route untuk user biasa */}
+      {/* Auth routes */}
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
 
+      {/* User routes */}
       <Route
         path="/"
         element={
@@ -34,7 +35,7 @@ function App() {
       />
       <Route path="/*" element={<UserRoutes />} />
 
-      {/* Route untuk admin */}
+      {/* Admin routes */}
       <Route
         path="/admin/users"
         element={
@@ -45,7 +46,6 @@ function App() {
           </ProtectedRoute>
         }
       />
-
       <Route
         path="/admin/profile"
         element={
@@ -56,7 +56,6 @@ function App() {
           </ProtectedRoute>
         }
       />
-
       <Route
         path="/admin/banner"
         element={
@@ -67,7 +66,6 @@ function App() {
           </ProtectedRoute>
         }
       />
-
       <Route
         path="/admin/promo"
         element={
@@ -78,7 +76,6 @@ function App() {
           </ProtectedRoute>
         }
       />
-
       <Route
         path="/admin/category"
         element={
@@ -89,7 +86,6 @@ function App() {
           </ProtectedRoute>
         }
       />
-
       <Route
         path="/admin/activities"
         element={
@@ -100,7 +96,6 @@ function App() {
           </ProtectedRoute>
         }
       />
-
       <Route
         path="/admin/transaction"
         element={

@@ -48,17 +48,21 @@ export const createTransaction = async ({ cartIds, paymentMethodId }) => {
     throw new Error("Metode pembayaran wajib diisi.");
   }
 
+  const payload = {
+    cartIds,
+    paymentMethodId,
+  };
+
+  console.log("📦 Payload ke /create-transaction:", payload);
+
   try {
-    const res = await axios.post(
-      `${API_URL}/create-transaction`,
-      { cartIds, paymentMethodId },
-      { headers: getAuthHeaders() }
-    );
+    const res = await axios.post(`${API_URL}/create-transaction`, payload, { headers: getAuthHeaders() });
 
     return res.data;
   } catch (err) {
     const message = err.response?.data?.message || "Gagal membuat transaksi.";
     console.error("❌ Error buat transaksi:", message);
+    console.error("🧾 Detail:", err.response?.data); // tambahkan log detail
     throw new Error(message);
   }
 };

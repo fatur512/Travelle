@@ -11,6 +11,7 @@ export default function CheckOutPage() {
 
   const items = location.state?.items || [];
   const total = location.state?.total || 0;
+  const cartIds = location.state?.cartIds || []; // ✅ Ambil cartIds yang dikirim
 
   const [proofImageUrl, setProofImageUrl] = useState(null);
   const [uploading, setUploading] = useState(false);
@@ -19,7 +20,6 @@ export default function CheckOutPage() {
   const handleImageUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
-
     setUploading(true);
     try {
       const imageUrl = await uploadTransactionImage(file);
@@ -33,32 +33,19 @@ export default function CheckOutPage() {
   };
 
   const handleCheckout = async () => {
-    if (!selectedPayment) {
-      alert("Silakan pilih metode pembayaran terlebih dahulu.");
-      return;
-    }
-
-    if (items.length === 0) {
-      alert("Tidak ada item yang dipilih untuk checkout.");
-      return;
-    }
-
-    const cartIds = items.map((item) => item.id); // Ambil id keranjang saja
-
     try {
-      await createTransaction({
-        cartIds,
-        paymentMethodId: selectedPayment,
-      });
-
-      alert("Checkout berhasil! Transaksi dikirim ke backend.");
+      if (!selectedPayment || !proofImageUrl || cartIds.length === 0) {
+        return alert("Lengkapi semua data: metode, bukti, dan keranjang.");
+      }
+      await createTransaction({ cartIds, paymentMethodId: selectedPayment });
+      alert("Checkout berhasil!");
       navigate("/my-transactions");
     } catch (error) {
-      alert("Gagal melakukan checkout. Silakan coba lagi.");
+      console.error("❌ Checkout gagal:", error);
+      alert(error.message || "Gagal membuat transaksi.");
     }
   };
 
-  // Jika tidak ada data dari location.state
   if (items.length === 0 || total === 0) {
     return (
       <div className="min-h-screen px-4 py-8 text-center text-gray-600">
@@ -75,15 +62,12 @@ export default function CheckOutPage() {
 
   return (
     <div className="min-h-screen px-4 py-8 bg-gray-100">
-      {/* Metode Pembayaran */}
       <div className="mb-6">
         <label className="block mb-2 text-sm font-semibold text-gray-700">Metode Pembayaran:</label>
         {paymentLoading ? (
           <p className="text-sm text-gray-500">Memuat metode pembayaran...</p>
         ) : error ? (
           <p className="text-sm text-red-500">{error}</p>
-        ) : paymentMethods.length === 0 ? (
-          <p className="text-sm text-gray-500">Tidak ada metode pembayaran tersedia.</p>
         ) : (
           <div className="grid gap-3 md:grid-cols-2">
             {paymentMethods.map((payment) => (
@@ -109,7 +93,6 @@ export default function CheckOutPage() {
         )}
       </div>
 
-      {/* Total & Upload Section */}
       <div className="p-4 space-y-4 bg-white shadow rounded-xl">
         <div className="flex justify-between text-lg font-bold text-gray-800">
           <span>Total:</span>
